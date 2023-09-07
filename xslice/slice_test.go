@@ -50,3 +50,30 @@ func TestDeleteByValues(t *testing.T) {
 		t.Errorf("Expected %s, but got %s", shouldAs, res)
 	}
 }
+
+func TestSetSliceCapacity(t *testing.T) {
+	a := make([]int, 0, 1000)
+	for i := 0; i < 100; i++ {
+		a = append(a, 1)
+	}
+	//常规扩缩容
+	res, err := SetSliceCapacity(a, 1.2, 100)
+	shouldA := 120
+	if err != nil || cap(res) != shouldA {
+		t.Errorf("Expected len %d, but got len %d", shouldA, cap(res))
+	}
+
+	//ratio<1
+	res, err = SetSliceCapacity(a, 0.9, 100)
+	if err == nil {
+		t.Error("Expected err msg , but got nil")
+	}
+
+	//最小值生效
+	shouldA = 200
+	res, err = SetSliceCapacity(a, 1.2, 200)
+	if err != nil || cap(res) != shouldA {
+		t.Errorf("Expected len %d, but got len %d", shouldA, cap(res))
+	}
+
+}
